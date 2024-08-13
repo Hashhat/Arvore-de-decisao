@@ -84,6 +84,12 @@ model = DecisionTreeClassifier(random_state=42)
 # grid search using cross-validation
 # cv = 3 is the number of folds
 # scoring = 'f' the metric for chosing the best model
+
+"""
+
+#mudei o scoring, antes não estava definido para multiclasses [0,1,2,3]
+
+"""
 clf = GridSearchCV(model, parameters, cv=30, scoring='f1_macro', verbose=4, error_score= 'raise')
 clf.fit(X_train, y_train)
 
