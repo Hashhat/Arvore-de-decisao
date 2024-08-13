@@ -17,7 +17,7 @@ from sklearn.metrics import classification_report
     #conteudo = arquivo.read()
     #print(conteudo)
 
-
+"""
 dados = []
 with open('C:\\Users\\r\\Desktop\\Arvore de decisao\\env_vital_signals.txt', 'r') as arquivo:
     for linha in arquivo:
@@ -39,10 +39,30 @@ for dado in dados:
 dfx = pd.DataFrame(Xm, columns=['qPA', 'pulso', 'frequência respiratória'])
 
 dfy = pd.DataFrame(Ym, columns=['classes de gravidade'])
+"""
+df = pd.read_csv('env_vital_signals.txt', header = None)
 
+indices_desejados = [3, 4, 5, 7]
+df_selecionado = df.iloc[:, indices_desejados]
 
-X_train, X_test, y_train, y_test = train_test_split(Xm, Ym, test_size=0.25, shuffle=True)
-print(f"Tamanho total do dataset: {len(Xm)}\n")
+#nova_linha = pd.DataFrame([["qPA", "Pulso", "frequência Respiratória", "y"]], columns=df_selecionado.columns)
+
+# Concatene a nova linha com o DataFrame existente
+#df_novo = pd.concat([nova_linha, df_selecionado], ignore_index=True)
+
+df_selecionado.columns = ["qPA", "Pulso", "frequência Respiratória", "y"]
+
+print(df_selecionado)
+
+print(df_selecionado["y"].value_counts())
+
+x = df_selecionado.drop("y", axis=1)
+y = df_selecionado["y"]
+
+#trainX, testX, trainY, testY = train_test_split(x, y, test_size = 0.2)
+
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.25, shuffle=True)
+print(f"Tamanho total do dataset: {len(x)}\n")
 print(f"Dados de treinamento X ({len(X_train)}):\n{X_train[:3]} ...")
 print(f"Dados de treinamento y:({len(y_train)})\n {y_train[:3]} ...")
 print("---")
@@ -53,8 +73,8 @@ print(f"Dados de teste   y:({len(y_test)})\n {y_test[:3]} ...")
 # Parameters' definition
 parameters = {
     'criterion': ['entropy'],
-    'max_depth': [6, 8],
-    'min_samples_leaf': [2, 3, 4]
+    'max_depth': [4, 6, 80],
+    'min_samples_leaf': [2, 3, 5, 10]
 }
 
 # instantiate model
@@ -64,7 +84,7 @@ model = DecisionTreeClassifier(random_state=42)
 # grid search using cross-validation
 # cv = 3 is the number of folds
 # scoring = 'f' the metric for chosing the best model
-clf = GridSearchCV(model, parameters, cv=3, scoring='f1', verbose=4)
+clf = GridSearchCV(model, parameters, cv=30, scoring='f1_macro', verbose=4, error_score= 'raise')
 clf.fit(X_train, y_train)
 
 # the best tree according to the f1 score
@@ -94,3 +114,7 @@ plt.show()
 #from sklearn.metrics import ConfusionMatrixDisplay
 #ConfusionMatrixDisplay.from_predictions(y_test, y_pred_test)
 #print(classification_report(y_test, y_pred_test))
+
+import joblib
+
+joblib.dump(best, 'modelo_arvore_decisao.pkl')
