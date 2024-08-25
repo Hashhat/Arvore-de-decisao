@@ -41,7 +41,9 @@ for valor, contagem in zip(valores_unicos, contagens):
 #calcula a proporção de previsões incorretas em relação ao total
 previsoes = clf.predict(x)
 erro = 1 - accuracy_score(y, previsoes)
+acuracia = accuracy_score(y, previsoes)
 
+print(f"Acuracia: {acuracia:.2f}")
 print(f"Taxa de Erro: {erro:.2f}")
 
 #calcula a média dos quadrados das diferenças entre as previsões e os valores reais
