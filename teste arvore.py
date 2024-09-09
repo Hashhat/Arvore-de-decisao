@@ -1,17 +1,12 @@
 import pandas as pd
-#import numpy as np
-#from scipy import stats
-#import matplotlib.pyplot as plt
-#import seaborn as sns
-
-
+import seaborn as sns
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
-
+import matplotlib.pyplot as plt
 #---------------------------------------------------------------------------------
 df = pd.read_csv('env_vital_signals.txt', header = None)
 
@@ -22,6 +17,7 @@ df_selecionado.columns = ["qPA", "Pulso", "frequência Respiratória", "y"]
 
 print(df_selecionado)
 
+
 print(df_selecionado["y"].value_counts())
 
 x = df_selecionado.drop("y", axis=1)
@@ -29,18 +25,11 @@ y = df_selecionado["y"]
 
 #---------------------------------------------------------------------------------
 X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.25, shuffle=True)
-#print(f"Tamanho total do dataset: {len(x)}\n")
-#print(f"Dados de treinamento X ({len(X_train)}):\n{X_train[:3]} ...")
-#print(f"Dados de treinamento y:({len(y_train)})\n {y_train[:3]} ...")
-#print("---")
-#print(f"Dados de teste   X ({len(X_test)}):\n{X_test[:3]} ...")
-#print(f"Dados de teste   y:({len(y_test)})\n {y_test[:3]} ...")
-
 
 # Parameters' definition
 parameters = {
     'criterion': ['entropy'],
-    'max_depth': [4, 6, 80],
+    'max_depth': [4, 6, 80, 100, 200],
     'min_samples_leaf': [2, 3, 5, 10]
 }
 
@@ -93,15 +82,22 @@ relatorio = classification_report(y_test, y_pred_test, target_names=['Classe 0',
 print(relatorio)
 #---------------------------------------------------------------------------------
 
-"""
+
 #Cria uma imagem da arvore
 from sklearn import tree
 fig = plt.figure(figsize=(200, 200))
-tree.plot_tree(best, feature_names=["X0", "X1" , "x2"], filled=False, rounded=False, class_names=["0", "1", "2", "3"], fontsize=5)
+tree.plot_tree(best, feature_names=["qPA", "Pulso", "frequência Respiratória"], filled=False, rounded=False, class_names=["0", "1", "2", "3"], fontsize=5)
 plt.savefig('grafico.png', format='png')
 plt.show()
-"""
 
+# Visualizar e salvar a matriz de confusão
+plt.figure(figsize=(10, 7))
+sns.heatmap(matriz_confusao, annot=True, fmt='d', cmap='Blues', xticklabels=['Classe 0', 'Classe 1', 'Classe 2', 'Classe 3'], yticklabels=['Classe 0', 'Classe 1', 'Classe 2', 'Classe 3'])
+plt.title('Matriz de Confusão')
+plt.xlabel('Predição')
+plt.ylabel('Real')
+plt.savefig('matriz_confusao.png')
+plt.show()
 #---------------------------------------------------------------------------------
 #cria o arquivo da arvore a ser exportada
 import joblib
